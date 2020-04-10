@@ -1,14 +1,33 @@
-version: 2.1
-orbs:
-  node: circleci/node@1.1
+version: 2
 jobs:
   build:
-    executor:
-      name: node/default
-      tag: '10.4'
+    docker:
+      - image: cicleci/node:10.16.3
     steps:
       - checkout
-      - node/with-cache:
-          steps:
-            - run: npm install
-      - run: npm run test
+      - run: echo "npm installing"
+      - run: npm install
+      - run: CI=true npm run build
+  test:
+    docker:
+      - image: cicleci/node:10.16.3
+    steps:
+      - checkout
+      - run: echo "testing stuff"
+      - run: npm install
+      - run: npm test
+  hithere:
+    docker:
+      - image: circleci/node:10.16.3
+    steps:
+      - checkout
+      - run: echo "heellooooo!"
+workflows:
+  version: 2
+  build_test_and_lint:
+    jobs:
+      - build
+      - hithere
+      - test:
+          requires:
+            - hithere
